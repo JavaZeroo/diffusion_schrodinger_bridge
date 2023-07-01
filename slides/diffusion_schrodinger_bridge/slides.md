@@ -33,6 +33,9 @@ fonts:
 - 找到粒子在两个不同时间的分布下最可能的路径。
 
 ---
+layout: section
+
+---
 
 # Methodology
 
@@ -117,40 +120,110 @@ $$
 
 有：
 $$
-% \begin{equation}
+\begin{equation}
 \begin{aligned}
   p_{k \mid k+1}\left(x_k \mid x_{k+1}\right)&=\frac{p_k\left(x_k\right) p_{k+1 \mid k}\left(x_{k+1} \mid x_k\right)}{p_{k+1}\left(x_{k+1}\right)} \\
   &=p_{k+1 \mid k}\left(x_{k+1} \mid x_k\right) \frac{p_k\left(x_k\right)}{p_{k+1}\left(x_{k+1}\right)}\\
   &=p_{k+1 \mid k}\left(x_{k+1} \mid x_k\right) \exp \left[\log p_k\left(x_k\right)-\log p_{k+1}\left(x_{k+1}\right)\right]
 
 \end{aligned}  
-% \end{equation}
+\end{equation}
 $$
 
-使用泰勒展开：我们对 $\log p_{k+1}$ 在 $x_{k+1}$ 处进行泰勒展开。泰勒展开是:
+和
+
 $$
-\log p_{k+1}\left(x_{k+1}\right) \approx \log p_{k+1}\left(x_k\right)+\frac{x_{k+1}-x_k}{1 !} \nabla \log p_{k+1}\left(x_k\right)
+\begin{equation}
+\begin{aligned}
+  p_{k+1 \mid k}\left(x_{k+1} \mid x_k\right)&=\mathcal{N}\left(x_{k+1} ; x_k+\gamma_{k+1} f\left(x_k\right), 2 \gamma_{k+1} \mathbf{I}\right) \\
+  &=\frac{1}{\sqrt{4 \pi \gamma_{k+1}}} \exp \left(-\frac{\left(x_{k+1}-x_k-\gamma_{k+1} f\left(x_k\right)\right)^2}{4 \gamma_{k+1}}\right)
+  
+\end{aligned}
+\end{equation}
 $$
 
-代入泰勒展开: 将泰勒展开代入原始公式后并化简：
-$$
-p_{k \mid k+1}\left(x_k \mid x_{k+1}\right) \approx p_{k+1 \mid k}\left(x_{k+1} \mid x_k\right) \exp \left[\log p_k\left(x_k\right)-\log p_{k+1}\left(x_k\right)-\left(x_{k+1}-x_k\right) \nabla \log p_{k+1}\left(x_k\right)\right]
-$$
 
 ---
 
 # (Before)Methodology - Diffusion Schrödinger Bridge
 
-同理：
+使用泰勒展开：我们对 $\log p_{k+1}$ 在 $x_k \approx x_{k+1}$ 处进行泰勒展开。泰勒展开是:
+$$
+\log p_{k+1}\left(x_{k+1}\right) \approx \log p_{k+1}\left(x_k\right)+\frac{x_{k+1}-x_k}{1 !} \nabla \log p_{k+1}\left(x_k\right)
+$$
+
+
+代入泰勒展开: 将泰勒展开代入原始公式后并化简：
+$$
+\begin{aligned}
+
+p_{k \mid k+1}\left(x_k \mid x_{k+1}\right) & \approx p_{k+1 \mid k}\left(x_{k+1} \mid x_k\right) \exp \left[\log p_k\left(x_k\right)-\log p_{k+1}\left(x_k\right)-\left(x_{k+1}-x_k\right) \nabla \log p_{k+1}\left(x_k\right)\right] \\
+
+&= p_{k+1 \mid k}\left(x_{k+1} \mid x_k\right) \exp \left[-2\left(x_{k+1}-x_k\right) \nabla \log p_{k+1}\left(x_k\right)\right] \\
+
+&\ \ \vdots \quad \text{算不动了} \\
+
+&= \mathcal{N}\left(x_k ; x_{k+1}-\gamma_{k+1} f\left(x_{k+1}\right)+2 \gamma_{k+1} \nabla 
+\log p_{k+1}\left(x_{k+1}\right), 2 \gamma_{k+1} \mathbf{I}\right)
+
+\end{aligned}
+$$
+
+---
+
+# Methodology - Diffusion Schrödinger Bridge
+
+对于第n次迭代，首先向前：
+
+$$
+\begin{aligned}
+p_{k+1 \mid k}^n\left(x_{k+1} \mid x_k\right)&=\mathcal{N}\left(x_{k+1} ; x_k+\gamma_{k+1} f_k^n\left(x_k\right), 2 \gamma_{k+1} \mathbf{I}\right) \\
+\text{with, } & p^0=p \text { and } f_k^0=f
+  
+\end{aligned}
+$$
+
+然后，向后：
+
 $$
 \begin{aligned}
 q_{k \mid k+1}^n\left(x_k \mid x_{k+1}\right) & =p_{k+1 \mid k}^n\left(x_{k+1} \mid x_k\right) \exp \left[\log p_k^n\left(x_k\right)-\log p_{k+1}^n\left(x_{k+1}\right)\right] \\
-& \approx \mathcal{N}\left(x_k ; x_{k+1}+\gamma_{k+1} b_{k+1}^n\left(x_{k+1}\right), 2 \gamma_{k+1} \mathbf{I}\right)
+& \approx \mathcal{N}\left(x_k ; x_{k+1}+\gamma_{k+1} b_{k+1}^n\left(x_{k+1}\right), 2 \gamma_{k+1} \mathbf{I}\right),\\
+\text{where}\ & b_{k+1}^n\left(x_{k+1}\right)=-f_k^n\left(x_{k+1}\right)+2 \nabla \log p_{k+1}^n\left(x_{k+1}\right)
 \end{aligned}
-\\
-\text{where, } b_{k+1}^n\left(x_{k+1}\right)=-f_k^n\left(x_{k+1}\right)+2 \nabla \log p_{k+1}^n\left(x_{k+1}\right)
 $$
 
+> 然后对于这个DSB算法的得分应该先比DDPM低，然后再超过DDPM。因为一开始直接近似为高斯分布，误差会非常大，需要多次迭代。
+
+
+---
+
+# Methodology - Diffusion Schrödinger Bridge
+
+现在我们要优化的目标就是：
+$$
+q_{k \mid k+1}^n\left(x_k \mid x_{k+1}\right)=\mathcal{N}\left(x_k ; B_{k+1}^n\left(x_{k+1}\right), 2 \gamma_{k+1} \mathbf{I}\right), p_{k+1 \mid k}^n\left(x_{k+1} \mid x_k\right)=\mathcal{N}\left(x_{k+1} ; F_k^n\left(x_k\right), 2 \gamma_{k+1} \mathbf{I}\right)
+$$
+
+因此：
+$$
+\begin{aligned}
+& B_{k+1}^n=\arg \min _{B \in \mathrm{L}^2\left(\mathbb{R}^d, \mathbb{R}^d\right)} \mathbb{E}_{p_{k, k+1}^n}\left[\left\|B \left(X_{k+1}\right)-\left(X_{k+1}+F_k^n\left(X_k\right)-F_k^n\left(X_{k+1}\right)\right)\right\|^2\right] \\
+& F_k^{n+1}=\arg \min _{F \in \mathrm{L}^2\left(\mathbb{R}^d, \mathbb{R}^d\right)} \mathbb{E}_{q_{k, k+1}^n}\left[\left\|F \left(X_k\right)-\left(X_k+B_{k+1}^n\left(X_{k+1}\right)-B_{k+1}^n\left(X_k\right)\right)\right\|^2\right]
+\end{aligned}
+$$
+
+> 这里我认为有一个推论就是，DSB在每次迭代的时候，都是在优化一个最小二乘问题。
+
+---
+layout: image-right
+
+# the image source
+image: ./img/alg.png
+---
+# Methodology - Diffusion Schrödinger Bridge
+
+每个iteration需要计算两次
 
 ---
 
@@ -164,3 +237,30 @@ $$
  \hat{\ell}_{n+1, I}^{\jmath}(\alpha)&=M^{-1} \sum_{(k, y) \in I}\left\|F_\alpha\left(k, X_k^{\jmath}\right)-\left(X_k^j+B_{k+1}^n\left(X_{k+1}^j\right)-B_{k+1}^n\left(X_k^{\jmath}\right)\right)\right\|^2 
 \end{aligned}
 $$
+
+---
+layout: two-cols
+---
+
+# Results
+
+<p style="text-align:center;">
+  <img src="img/scurve_0123.gif" width="300"> 
+  <img src="img/scurve_init.png" width="300">
+</p>
+
+::right::
+
+# 不同DSB迭代次数的结果
+
+<p style="text-align:center;">
+  <img src="img/swiss_0123.gif" width="300"> 
+  <img src="img/swiss_init.png" width="300">
+</p>
+
+---
+
+# Disscussion
+
+- 加速 Score-based generative modeling
+- 原理是通过近似模拟IPF算法
