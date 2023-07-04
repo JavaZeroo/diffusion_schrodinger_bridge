@@ -227,6 +227,28 @@ image: ./img/alg.png
 
 ---
 
+# Continuous-time IPF
+
+$$
+\Pi^{\star}=\arg \min \left\{\operatorname{KL}(\Pi \mid \mathbb{P}): \Pi \in \mathscr{P}(\mathcal{C}), \Pi_0=p_{\text {data }}, \Pi_T=p_{\text {prior }}\right\}, \quad T=\sum_{k=0}^{N-1} \gamma_{k+1}
+$$
+
+$$
+\begin{aligned}
+\Pi^{2 n+1}&=\arg \min \left\{\mathrm{KL}\left(\Pi \mid \Pi^{2 n}\right): \Pi \in \mathscr{P}(\mathcal{C}), \Pi_T=p_{\text {prior }}\right\}, \\
+\Pi^{2 n+2}&=\arg \min \left\{\mathrm{KL}\left(\Pi \mid \Pi^{2 n+1}\right): \Pi \in \mathscr{P}(\mathcal{C}), \Pi_0=p_{\text {data }}\right\}
+\end{aligned}
+$$
+
+> $$
+> \begin{aligned}
+> \pi^{2 n+1} & =\arg \min \left\{\mathrm{KL}\left(\pi \mid \pi^{2 n}\right): \pi \in \mathscr{P}_{N+1}, \pi_N=p_{\text {prior }}\right\} \\
+> \pi^{2 n+2} & =\arg \min \left\{\mathrm{KL}\left(\pi \mid \pi^{2 n+1}\right): \pi \in \mathscr{P}_{N+1}, \pi_0=p_{\text {data }}\right\} 
+> \end{aligned}
+> $$
+
+---
+
 # Train
 
 ## Loss function

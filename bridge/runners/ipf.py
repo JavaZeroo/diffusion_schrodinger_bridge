@@ -23,12 +23,14 @@ class IPFBase(torch.nn.Module):
 
     def __init__(self, args):
         super().__init__()
+        args.device = 'cpu'
+        args.dataparallel = False
         self.args = args
 
         #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.accelerator = Accelerator(fp16=False, cpu=args.device == 'cpu')
         self.device = self.accelerator.device  # torch.device(args.device)
-
+        print(self.device)
         # training params
         self.n_ipf = self.args.n_ipf
         self.num_steps = self.args.num_steps
@@ -342,6 +344,7 @@ class IPFSequential(IPFBase):
 
     def __init__(self, args):
         super().__init__(args)
+        # self.args.device = 'cpu
 
     def ipf_step(self, forward_or_backward, n):
         new_dl = None
@@ -356,8 +359,9 @@ class IPFSequential(IPFBase):
 
         for i in tqdm(range(self.num_iter+1)):
             self.set_seed(seed=n*self.num_iter+i)
-
             x, out, steps_expanded = next(new_dl)
+            if self.args.debug:
+                print(x.shape)
             x = x.to(self.device)
             out = out.to(self.device)
             steps_expanded = steps_expanded.to(self.device)
@@ -429,3 +433,40 @@ class IPFSequential(IPFBase):
             else:
                 self.ipf_step('b', n)
                 self.ipf_step('f', n)
+
+class IPFPredict(IPFBase):
+    def __init__(self, args):
+        super().__init__(args)
+        self.build_models('b')
+
+    def build_models(self, forward_or_backward=None):
+        # running network
+        net_f, net_b = get_models(self.args)
+
+        if self.args.checkpoint_run:
+            if "checkpoint_f" in self.args:
+                net_f.load_state_dict(torch.load(self.args.checkpoint_f))
+            if "checkpoint_b" in self.args:
+                net_b.load_state_dict(torch.load(self.args.checkpoint_b))
+
+        if self.args.dataparallel:
+            net_f = torch.nn.DataParallel(net_f)
+            net_b = torch.nn.DataParallel(net_b)
+
+        if forward_or_backward is None:
+            net_f = net_f.to(self.device)
+            net_b = net_b.to(self.device)
+            self.net = torch.nn.ModuleDict({'f': net_f, 'b': net_b})
+        if forward_or_backward == 'f':
+            net_f = net_f.to(self.device)
+            self.net.update({'f': net_f})
+        if forward_or_backward == 'b':
+            net_b = net_b.to(self.device)
+            self.net.update({'b': net_b})    
+    
+
+    # Add Predict function
+    def predict(self, x):
+        print(x.device)
+        pred = self.net['b'](x, torch.Tensor(5000))
+        return pred
