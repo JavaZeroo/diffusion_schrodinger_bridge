@@ -15,10 +15,13 @@ class Stacked_MNIST(Dataset):
                  train=True, num_channels=3, device='cpu'):  # load=True means loading the dataset from existed files.
         super(Stacked_MNIST, self).__init__()
         self.num_channels = min(3,num_channels)
-        if load:
+
+        if True:
             self.data = torch.load(os.path.join(root, "data.pt"))
             self.targets = torch.load(os.path.join(root, "targets.pt"))
+            print("Loaded Stacked MNIST from {}".format(root))
         else:
+            print("Downloading Stacked MNIST")
             if source_root is None:
                 source_root = "./datasets"
 

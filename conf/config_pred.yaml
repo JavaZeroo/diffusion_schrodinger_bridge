@@ -1,0 +1,33 @@
+# @package _global_
+
+defaults:
+  - launcher: local
+  - job
+  - dataset: 2d #celeba, 2d, stackedmnist
+  - model: Basic #Basic, UNET
+  
+# device: 'cpu'
+# data
+data_dir: ./data/
+
+# logging
+LOGGER: CSV # NEPTUNE, CSV, NONE
+CSV_log_dir: ./
+
+cache_gpu: False
+num_cache_batches: 1
+cache_refresh_stride: 100
+plot_level: 1
+mean_match: True
+paths: 
+  experiments_dir_name: experiments
+
+# checkpoint
+checkpoint_run: True
+checkpoint_it: 13
+checkpoint_pass: backward
+sample_checkpoint_f: "/mnt/e/Code/diffusion_schrodinger_bridge/experiments/2023-06-29/main/model=UNET,num_iter=5000,num_steps=30/11-56-59/checkpoints/sample_net_f_20_5000.ckpt"
+sample_checkpoint_b: "/mnt/e/Code/diffusion_schrodinger_bridge/experiments/2023-06-29/main/model=UNET,num_iter=5000,num_steps=30/11-56-59/checkpoints/sample_net_b_20_5000.ckpt"
+checkpoint_f: "/mnt/e/Code/diffusion_schrodinger_bridge/experiments/2023-06-29/main/model=UNET,num_iter=5000,num_steps=30/11-56-59/checkpoints/net_f_20_5000.ckpt"
+checkpoint_b: "/mnt/e/Code/diffusion_schrodinger_bridge/experiments/2023-06-29/main/model=UNET,num_iter=5000,num_steps=30/11-56-59/checkpoints/net_b_20_5000.ckpt"
+

@@ -1,5 +1,7 @@
 # @package _global_
 
+debug: True
+
 defaults:
   - _self_
   - launcher: local
