@@ -65,7 +65,7 @@ def get_models(args):
                     "num_heads_upsample": args.model.num_heads_upsample,
                     "use_scale_shift_norm": args.model.use_scale_shift_norm
                 }
-
+        print(kwargs)
         net_f, net_b = UNetModel(**kwargs), UNetModel(**kwargs)   
        
     return net_f, net_b

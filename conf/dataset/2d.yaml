@@ -4,7 +4,7 @@ Dataset: 2d
 data: scurve
 
 # transfer
-transfer: False
+transfer: True
 Dataset_transfer: 2d
 data_transfer: circle
 

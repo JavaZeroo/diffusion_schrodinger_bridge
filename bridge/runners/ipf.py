@@ -18,6 +18,7 @@ from torch.utils.data import WeightedRandomSampler
 from accelerate import Accelerator, DistributedType
 import time
 
+import pickle
 
 class IPFBase(torch.nn.Module):
 
@@ -26,7 +27,7 @@ class IPFBase(torch.nn.Module):
         self.args = args
 
         #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.accelerator = Accelerator(fp16=False, cpu=args.device == 'cpu')
+        self.accelerator = Accelerator(mixed_precision="fp16", cpu=args.device == 'cpu')
         self.device = self.accelerator.device  # torch.device(args.device)
 
         # training params
@@ -114,7 +115,7 @@ class IPFBase(torch.nn.Module):
     def build_models(self, forward_or_backward=None):
         # running network
         net_f, net_b = get_models(self.args)
-
+        print(f"net_f: {int(sum(p.numel() for p in net_f.parameters())/1000)}M\nnet_b: {int(sum(p.numel() for p in net_b.parameters())/1000)}M")
         if self.args.checkpoint_run:
             if "checkpoint_f" in self.args:
                 net_f.load_state_dict(torch.load(self.args.checkpoint_f))
